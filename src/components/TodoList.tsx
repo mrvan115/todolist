@@ -1,48 +1,48 @@
 import { FC } from 'react'
-import { TaskType } from '../App'
 
 type TodoListPropsType = {
 	title: string
 	tasks: Array<TaskType>
+	removeTask: (taskId: number) => void
+	changeFilter: (filter: FilterValuesType) => void
 }
-const TodoList: FC<TodoListPropsType> = (props) => {
-	let isAllTasksNotIsDone = true
 
-	for (let i = 0; i < props.tasks.length; i++) {
-		if (props.tasks[i].isDone) {
-			isAllTasksNotIsDone = false
-			break
-		}
-	}
+export type TaskType = {
+	id: number
+	title: string
+	isDone: boolean
+}
 
-	const todoClasses = isAllTasksNotIsDone ? 'todolist-empty' : 'todolist'
-
+export type FilterValuesType = 'all' | 'active' | 'completed'
+const TodoList: FC<TodoListPropsType> = ({
+	title,
+	tasks,
+	removeTask,
+	changeFilter
+}) => {
 	return (
 		<div>
-			<div className={todoClasses}>
-				<h3>{props.title}</h3>
+			<div className='todolist'>
+				<h3>{title}</h3>
 				<div>
 					<input />
 					<button>+</button>
 				</div>
 				<ul>
-					<li>
-						<input type='checkbox' checked={props.tasks[0].isDone} />{' '}
-						<span>{props.tasks[0].title}</span>
-					</li>
-					<li>
-						<input type='checkbox' checked={props.tasks[1].isDone} />{' '}
-						<span>{props.tasks[1].title}</span>
-					</li>
-					<li>
-						<input type='checkbox' checked={props.tasks[2].isDone} />{' '}
-						<span>{props.tasks[2].title}</span>
-					</li>
+					{tasks.map((t) => {
+						return (
+							<li key={t.id}>
+								<input type='checkbox' checked={t.isDone} />{' '}
+								<span>{t.title}</span>
+								<button onClick={() => removeTask(t.id)}>✖️</button>
+							</li>
+						)
+					})}
 				</ul>
 				<div>
-					<button>All</button>
-					<button>Active</button>
-					<button>Completed</button>
+					<button onClick={() => changeFilter('all')}>All</button>
+					<button onClick={() => changeFilter('active')}>Active</button>
+					<button onClick={() => changeFilter('completed')}>Completed</button>
 				</div>
 			</div>
 		</div>
