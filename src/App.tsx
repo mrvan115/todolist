@@ -53,8 +53,22 @@ function App() {
 		}
 	}
 
+	//resetTasks
+	const resetTasks = () => {
+		setTasks([])
+	}
+
 	// Filtered data
 	const filteredTasks: TaskType[] = getFilteredTasks(tasks, filter)
+
+	// changeTaskStatus
+	const changeTaskStatus = (taskId: string, isDone: boolean) => {
+		let task = tasks.find((t) => t.id === taskId)
+		if (task) {
+			task.isDone = isDone
+		}
+		setTasks([...tasks])
+	}
 
 	return (
 		<div className='App'>
@@ -64,6 +78,9 @@ function App() {
 				removeTask={removeTask}
 				changeFilter={changeFilter}
 				addTask={addTask}
+				resetTasks={resetTasks}
+				changeTaskStatus={changeTaskStatus}
+				filter={filter}
 			/>
 		</div>
 	)

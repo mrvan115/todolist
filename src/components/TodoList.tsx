@@ -1,4 +1,6 @@
 import React, { KeyboardEvent, ChangeEvent, FC, useState } from 'react'
+import { Simulate } from 'react-dom/test-utils'
+import error = Simulate.error
 
 type TodoListPropsType = {
 	titleTask: string
@@ -6,6 +8,9 @@ type TodoListPropsType = {
 	removeTask: (taskId: string) => void
 	changeFilter: (filter: FilterValuesType) => void
 	addTask: (titleInput: string) => void
+	resetTasks: () => void
+	changeTaskStatus: (taskId: string, isDone: boolean) => void
+	filter: FilterValuesType
 }
 
 export type TaskType = {
@@ -22,12 +27,24 @@ const TodoList: FC<TodoListPropsType> = ({
 	tasks,
 	removeTask,
 	changeFilter,
-	addTask
+	addTask,
+	resetTasks,
+	changeTaskStatus,
+	filter
 }) => {
 	const inputLi = tasks.map((t) => {
+		const onChangeHandlerInLi = (e: ChangeEvent<HTMLInputElement>) => {
+			let newStatus = e.currentTarget.checked
+			changeTaskStatus(t.id, newStatus)
+		}
 		return (
-			<li key={t.id}>
-				<input type='checkbox' checked={t.isDone} /> <span>{t.titleTask}</span>
+			<li key={t.id} className={t.isDone ? 'is-done' : ''}>
+				<input
+					type='checkbox'
+					checked={t.isDone}
+					onChange={onChangeHandlerInLi}
+				/>{' '}
+				<span>{t.titleTask}</span>
 				<button onClick={() => removeTask(t.id)}>✖️</button>
 			</li>
 		)
@@ -38,14 +55,20 @@ const TodoList: FC<TodoListPropsType> = ({
 	const completedButton = () => changeFilter('completed')
 
 	const [titleInput, setTitleInput] = useState('')
+	const [error, setError] = useState<string | null>(null)
 
 	const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		setTitleInput(e.currentTarget.value)
+		setError(null)
 	}
 
 	const addTaskCB = () => {
-		addTask(titleInput)
-		setTitleInput('')
+		if (titleInput.trim() !== '') {
+			addTask(titleInput)
+			setTitleInput('')
+		} else {
+			setError('Title is required')
+		}
 	}
 
 	const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) =>
@@ -60,14 +83,34 @@ const TodoList: FC<TodoListPropsType> = ({
 						value={titleInput}
 						onChange={onChangeHandler}
 						onKeyDown={onKeyPressHandler}
+						className={error ? 'error' : ''}
 					/>
 					<button onClick={addTaskCB}>+</button>
+					{error && <div className='error-messege'>{error}</div>}
 				</div>
 				<ul>{inputLi}</ul>
 				<div>
-					<button onClick={allButton}>All</button>
-					<button onClick={activeButton}>Active</button>
-					<button onClick={completedButton}>Completed</button>
+					<button
+						className={filter === 'all' ? 'active-filter' : ''}
+						onClick={allButton}
+					>
+						All
+					</button>
+					<button
+						className={filter === 'active' ? 'active-filter' : ''}
+						onClick={activeButton}
+					>
+						Active
+					</button>
+					<button
+						className={filter === 'completed' ? 'active-filter' : ''}
+						onClick={completedButton}
+					>
+						Completed
+					</button>
+					<button className='reset' onClick={resetTasks}>
+						Reset
+					</button>
 				</div>
 			</div>
 		</div>
