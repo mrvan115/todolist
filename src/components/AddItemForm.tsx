@@ -1,4 +1,6 @@
 import { ChangeEvent, FC, KeyboardEvent, useState } from 'react'
+import { IconButton, TextField } from '@mui/material'
+import AddBoxIcon from '@mui/icons-material/AddBox'
 
 type AddItemFormPropsType = {
 	addItem: (title: string) => void
@@ -12,7 +14,6 @@ export const AddItemForm: FC<AddItemFormPropsType> = (props) => {
 		setNewTaskTitle(e.currentTarget.value)
 		setError(null)
 	}
-
 	const onKeyDownHandler = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.ctrlKey && e.key === 'Enter') {
 			if (newTaskTitle.trim() !== '') {
@@ -23,7 +24,6 @@ export const AddItemForm: FC<AddItemFormPropsType> = (props) => {
 			}
 		}
 	}
-
 	const addTaskHandler = () => {
 		if (newTaskTitle.trim() !== '') {
 			props.addItem(newTaskTitle)
@@ -35,14 +35,18 @@ export const AddItemForm: FC<AddItemFormPropsType> = (props) => {
 
 	return (
 		<div>
-			<input
+			<TextField
+				variant={'outlined'}
+				label={'Type value'}
 				value={newTaskTitle}
 				onChange={onChangeHandler}
 				onKeyDown={onKeyDownHandler}
-				className={error ? 'error' : ''}
+				error={!!error}
+				helperText={error}
 			/>
-			<button onClick={addTaskHandler}>+</button>
-			{error && <div className='error-message'>{error}</div>}
+			<IconButton color={'primary'} size={'small'} onClick={addTaskHandler}>
+				<AddBoxIcon />
+			</IconButton>
 		</div>
 	)
 }
