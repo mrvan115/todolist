@@ -7,12 +7,12 @@ import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material/'
 import MenuIcon from '@mui/icons-material/Menu'
 import { Container, Grid, Paper } from '@mui/material'
 
-type TodolistType = {
+export type TodolistType = {
 	id: string
 	title: string
 	filter: FilterValuesType
 }
-type TasksStateType = {
+export type TasksStateType = {
 	[key: string]: TaskType[]
 }
 
@@ -72,6 +72,7 @@ function App() {
 			setTasksObj({ ...tasksObj })
 		}
 	}
+
 	const removeTodolist = (todolistId: string) => {
 		let filteredTodolists = todolists.filter((tl) => tl.id !== todolistId)
 		setTodolists(filteredTodolists)
