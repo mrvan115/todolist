@@ -1,9 +1,11 @@
-import {Task} from "../App.tsx";
+import {FilterValues, Task} from "../App.tsx";
 import {Button} from "./Button.tsx";
 
 type Props = {
     title: string
     tasks: Task[]
+    deleteTask: (taskId: number) => void
+    changeFilter: (filter: FilterValues) => void
 }
 
 export const TodolistItem = (props: Props) => {
@@ -23,15 +25,16 @@ export const TodolistItem = (props: Props) => {
                             <li key={task.id}>
                                 <input type="checkbox" checked={task.isDone}/>
                                 <span>{task.title}</span>
+                                <Button title={'x'} onClick={()=>props.deleteTask(task.id)}/>
                             </li>
                         )
                     })}
                 </ul>
             )}
             <div>
-                <Button title={'All'}/>
-                <Button title={'Active'}/>
-                <Button title={'Completed'}/>
+                <Button title={'All'} onClick={() => props.changeFilter('all')}/>
+                <Button title={'Active'} onClick={() => props.changeFilter('active')}/>
+                <Button title={'Completed'} onClick={() => props.changeFilter('completed')}/>
             </div>
         </div>
     );
