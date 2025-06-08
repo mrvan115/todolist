@@ -1,6 +1,6 @@
 import './App.css'
 import {TodolistItem} from "./components/TodolistItem.tsx";
-import {useState} from "react";
+import {useReducer, useState} from "react";
 import {v1} from "uuid";
 import {CreateItemForm} from "./components/CreateItemForm.tsx";
 import AppBar from '@mui/material/AppBar'
@@ -15,6 +15,19 @@ import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {containerSx} from "./components/TodolistItem.styles.ts";
 import Switch from '@mui/material/Switch'
 import CssBaseline from '@mui/material/CssBaseline'
+import {
+    changeTodolistFilterAC,
+    changeTodolistTitleAC,
+    createTodolistAC, deleteTodolistAC,
+    todolistsReducer
+} from "./model/todolists-reducer.ts";
+import {
+    changeTaskStatusAC,
+    changeTaskTitleAC,
+    createTaskAC,
+    deleteTaskAC,
+    tasksReducer
+} from "./model/tasks-reducer.ts";
 
 export type Task = {
     id: string
@@ -38,71 +51,81 @@ export type TasksState = {
 type ThemeMode = 'dark' | 'light'
 
 export const App = () => {
-    const todolistId1 = v1()
-    const todolistId2 = v1()
+    const [todolists, dispatchToTodolists] = useReducer(todolistsReducer, [])
 
-    const [todolists, setTodolists] = useState<Todolist[]>([
-        {id: todolistId1, title: 'What to learn', filter: 'all'},
-        {id: todolistId2, title: 'What to buy', filter: 'all'},
-    ])
-
-    const [tasks, setTasks] = useState<TasksState>({
-        [todolistId1]: [
-            {id: v1(), title: 'HTML&CSS', isDone: true},
-            {id: v1(), title: 'JS', isDone: true},
-            {id: v1(), title: 'ReactJS', isDone: false},
-        ],
-        [todolistId2]: [
-            {id: v1(), title: 'Typescript', isDone: false},
-            {id: v1(), title: 'RTK query', isDone: false}
-        ]
-    })
-
+    // const [tasks, setTasks] = useState<TasksState>({})
+    const [tasks, dispatchToTasks] = useReducer(tasksReducer, {})
 
 
     const changeFilter = (todolistId: string, filter: FilterValues) => {
-        setTodolists(todolists.map(todolist => todolist.id === todolistId ? {...todolist, filter} : todolist))
+        // setTodolists(todolists.map(todolist => todolist.id === todolistId ? {...todolist, filter} : todolist))
+
+        dispatchToTodolists(changeTodolistFilterAC({todolistId, filter}))
+    }
+
+    const createTodolist = (title: string) => {
+        // const todolistId = v1()
+        // const newTodolist: Todolist = {id: todolistId, title, filter: 'all'}
+        // setTodolists([newTodolist, ...todolists])
+        // setTasks({...tasks, [todolistId]: []})
+
+        const action = createTodolistAC(title)
+        dispatchToTodolists(action)
+
+        // setTasks({...tasks, [action.payload.id]: []})
+
+        dispatchToTasks(action)
+    }
+
+    const deleteTodolist = (todolistId: string) => {
+        // setTodolists(todolists.filter(todolist => todolist.id !== todolistId))
+        // delete tasks[todolistId]
+        // setTasks({...tasks})
+
+        const action = deleteTodolistAC(todolistId)
+
+        dispatchToTodolists(action)
+
+        // delete tasks[todolistId]
+        // setTasks({...tasks})
+
+        dispatchToTasks(action)
+
+    }
+
+    const changeTodolistTitle = (todolistId: string, title: string) => {
+        // setTodolists(todolists.map(todolist => todolist.id === todolistId ? {...todolist, title} : todolist))
+
+        dispatchToTodolists(changeTodolistTitleAC({todolistId, newTitle: title}))
     }
 
 
     const deleteTask = (todolistId: string, taskId: string) => {
-        setTasks({
-            ...tasks, [todolistId]: tasks[todolistId].filter(task =>
-                task.id !== taskId)
-        })
+        // setTasks({...tasks, [todolistId]: tasks[todolistId].filter(task => task.id !== taskId)})
+
+        dispatchToTasks(deleteTaskAC({todolistId, taskId}))
     }
 
     const createTask = (todolistId: string, title: string) => {
-        const newTask = {id: v1(), title: title, isDone: false}
-        setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
+        // setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
+        // const newTask = {id: v1(), title: title, isDone: false}
+
+        dispatchToTasks(createTaskAC({todolistId, title}))
     }
 
     const changeTaskStatus = (todolistId: string, taskId: string, isDone: boolean) => {
-        setTasks({...tasks, [todolistId]: tasks[todolistId].map(task => task.id == taskId ? {...task, isDone} : task)})
+        // setTasks({...tasks, [todolistId]: tasks[todolistId].map(task => task.id == taskId ? {...task, isDone} : task)})
+
+        dispatchToTasks(changeTaskStatusAC({todolistId, taskId, isDone}))
     }
 
-    const deleteTodolist = (todolistId: string) => {
-        setTodolists(todolists.filter(todolist => todolist.id !== todolistId))
-
-        delete tasks[todolistId]
-
-        setTasks({...tasks})
-    }
-
-    const createTodolist = (title: string) => {
-        const todolistId = v1()
-        const newTodolist: Todolist = {id: todolistId, title, filter: 'all'}
-        setTodolists([newTodolist, ...todolists])
-        setTasks({...tasks, [todolistId]: []})
-    }
 
     const changeTaskTitle = (todolistId: string, taskId: string, title: string) => {
-        setTasks({...tasks, [todolistId]: tasks[todolistId].map(task => task.id === taskId ? {...task, title} : task)})
+        // setTasks({...tasks, [todolistId]: tasks[todolistId].map(task => task.id === taskId ? {...task, title} : task)})
+
+        dispatchToTasks(changeTaskTitleAC({todolistId, taskId, title}))
     }
 
-    const changeTodolistTitle = (todolistId: string, title: string) => {
-        setTodolists(todolists.map(todolist => todolist.id === todolistId ? {...todolist, title} : todolist))
-    }
 
     const [themeMode, setThemeMode] = useState<ThemeMode>('light')
 
@@ -124,7 +147,7 @@ export const App = () => {
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
                 <AppBar position="static" sx={{mb: '30px'}}>
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
                         <Container maxWidth={'lg'} sx={containerSx}>
                             <IconButton color={"inherit"}>
                                 <MenuIcon/>
