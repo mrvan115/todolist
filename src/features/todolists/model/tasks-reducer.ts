@@ -1,10 +1,22 @@
-import {TasksState} from "../app/App.tsx";
 import {createTodolistAC, deleteTodolistAC} from "./todolists-reducer.ts";
 import {createAction, createReducer, nanoid} from "@reduxjs/toolkit";
 
 const initialState: TasksState = {}
 
 //-TYPES------------------------------------------------------
+
+//Также для этой задачи также подходит утилитный тип Typescript Record (style guide):
+export type TasksState = {
+    [key: string]: Task[]
+}
+
+export type Task = {
+    id: string
+    title: string
+    isDone: boolean
+}
+
+
 // type Actions =
 //     CreateTodolistAction
 //     | DeleteTodolistAction
